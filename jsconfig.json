@@ -4,6 +4,6 @@
       "@/*": ["./*"]
     },
     "typeRoots": ["./node_modules/@types"],
-    "types": ["node"]
+    "types": ["node"] // Add this line
   }
 }
