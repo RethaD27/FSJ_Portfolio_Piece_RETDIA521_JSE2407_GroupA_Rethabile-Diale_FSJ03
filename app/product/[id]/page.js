@@ -1,20 +1,9 @@
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import ImageGallery from '../../components/ImageGallery';
 import ReviewsSection from './ReviewsSection';
 import { fetchProductById } from '@/app/api';
-import GoBackButton from '../../components/GoBackButton.js'; // Import the GoBackButton
+import GoBackButton from '../../components/GoBackButton';
 
-/**
- * Generates metadata for the product page based on the product data.
- *
- * @async
- * @function generateMetadata
- * @param {Object} context - The context object.
- * @param {Object} context.params - The route parameters.
- * @param {string} context.params.id - The product ID from the URL.
- * @returns {Promise<Object>} Metadata object containing the page title and description.
- */
 export async function generateMetadata({ params }) {
   const product = await fetchProductById(params.id);
 
@@ -26,64 +15,43 @@ export async function generateMetadata({ params }) {
   }
 
   return {
-    title: `${product.title} | QuickCart Emporium`,
+    title: `${product.title}`,
     description: product.description,
+    openGraph: {
+      title: `${product.title} | QuickCart Emporium`,
+      description: product.description,
+      images: [{ url: product.images[0], width: 800, height: 600, alt: product.title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${product.title} | QuickCart Emporium`,
+      description: product.description,
+      images: [product.images[0]],
+    },
   };
 }
 
-/**
- * Fetches product data by ID from the API.
- *
- * @async
- * @function fetchProductData
- * @param {string} id - The product ID to fetch.
- * @throws Will throw an error if the product is not found.
- * @returns {Promise<Object>} The product data.
- */
 async function fetchProductData(id) {
   const product = await fetchProductById(id);
   if (!product) notFound();
   return product;
 }
 
-/**
- * Renders the product detail page with product information, images, and reviews.
- *
- * @component
- * @async
- * @param {Object} props - The component props.
- * @param {Object} props.params - The route parameters.
- * @param {string} props.params.id - The product ID from the URL.
- * @returns {Promise<JSX.Element>} The product detail page component.
- *
- * @example
- * // Example usage:
- * const params = { id: '123' };
- * <ProductPage params={params} />
- */
 export default async function ProductPage({ params }) {
   const product = await fetchProductData(params.id);
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gradient-to-r from-indigo-50 to-purple-50">
-      {/* Go Back Button */}
-      <GoBackButton /> {/* Use the GoBackButton component */}
-
+      <GoBackButton />
       <div className="bg-white rounded-lg shadow-2xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300">
         <div className="md:flex">
           <div className="md:w-1/2">
             <ImageGallery images={product.images} />
           </div>
           <div className="md:w-1/2 p-8 bg-gradient-to-br from-white to-indigo-50">
-            <h1 className="text-4xl font-bold mb-4 text-indigo-800">
-              {product.title}
-            </h1>
-            <p className="text-3xl font-semibold text-indigo-600 mb-4">
-              ${product.price.toFixed(2)}
-            </p>
-            <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-              {product.description}
-            </p>
+            <h1 className="text-4xl font-bold mb-4 text-indigo-800">{product.title}</h1>
+            <p className="text-3xl font-semibold text-indigo-600 mb-4">${product.price.toFixed(2)}</p>
+            <p className="text-gray-700 mb-6 text-lg leading-relaxed">{product.description}</p>
             <div className="mb-4 flex flex-wrap">
               {product.tags.map((tag, index) => (
                 <span
@@ -117,7 +85,6 @@ export default async function ProductPage({ params }) {
             </button>
           </div>
         </div>
-        {/* Client-Side Component for Reviews */}
         <ReviewsSection reviews={product.reviews} />
       </div>
     </div>
