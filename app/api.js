@@ -1,6 +1,7 @@
+// api.js
 import { cache } from 'react';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://next-ecommerce-api.vercel.app';
+//const API_BASE_URL = '/api';
 
 export const fetchProducts = cache(async (params = {}) => {
   const {
@@ -12,32 +13,26 @@ export const fetchProducts = cache(async (params = {}) => {
     sortOrder = 'asc',
   } = params;
 
-  const skip = (page - 1) * limit;
   const queryParams = new URLSearchParams({
+    page: page.toString(),
     limit: limit.toString(),
-    skip: skip.toString(),
     search,
     category,
     sortBy,
-    order: sortOrder,
+    sortOrder,
   });
 
-  const response = await fetch(`${API_BASE_URL}/products?${queryParams}`, { next: { revalidate: 60 } });
+  const response = await fetch(`/api/products?${queryParams}`);
   
   if (!response.ok) {
     throw new Error('Failed to fetch products');
   }
 
-  const data = await response.json();
-  return {
-    products: data || [],
-    totalPages: data.totalPages || 1,
-    totalProducts: data.totalProducts || 0,
-  };
+  return response.json();
 });
 
 export const fetchProductById = cache(async (id) => {
-  const response = await fetch(`${API_BASE_URL}/products/${id}`, { next: { revalidate: 60 } });
+  const response = await fetch(`/api/product/${id}`);
   
   if (!response.ok) {
     if (response.status === 404) {
@@ -50,7 +45,7 @@ export const fetchProductById = cache(async (id) => {
 });
 
 export const fetchCategories = cache(async () => {
-  const response = await fetch(`${API_BASE_URL}/categories`, { next: { revalidate: 3600 } });
+  const response = await fetch(`/api/categories`);
   
   if (!response.ok) {
     throw new Error('Failed to fetch categories');
