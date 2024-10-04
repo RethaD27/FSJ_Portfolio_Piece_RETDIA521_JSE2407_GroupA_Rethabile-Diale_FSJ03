@@ -1,22 +1,22 @@
-// pages/api/categories.js
-import { db } from '../../firebase';
+import { db } from '../../../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 
-export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    res.setHeader('Allow', ['GET']);
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
+export async function GET() {
   try {
     const categoriesSnapshot = await getDocs(collection(db, 'categories'));
     const categories = categoriesSnapshot.docs.map(doc => ({
       id: doc.id,
       name: doc.data().name
     }));
-    res.status(200).json(categories);
+    return new Response(JSON.stringify(categories), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Failed to fetch categories:', error);
-    res.status(500).json({ error: 'Failed to fetch categories', details: error.message });
+    return new Response(JSON.stringify({ error: 'Failed to fetch categories' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }

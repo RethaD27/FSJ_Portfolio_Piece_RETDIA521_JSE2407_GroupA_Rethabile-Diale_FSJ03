@@ -2,18 +2,17 @@ import { db } from '../../../firebase';
 import { collection, query, where, orderBy, limit, getDocs, startAfter } from 'firebase/firestore';
 import Fuse from 'fuse.js';
 
+
+
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   
-  const page = searchParams.get('page') || '1';
-  const limitValue = searchParams.get('limit') || '20'; // Renamed for clarity
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const limitValue = parseInt(searchParams.get('limit') || '20', 10);
   const search = searchParams.get('search') || '';
   const category = searchParams.get('category') || '';
   const sortBy = searchParams.get('sortBy') || 'price';
   const sortOrder = searchParams.get('sortOrder') || 'asc';
-
-  const pageNumber = parseInt(page, 10);
-  const limitNumber = parseInt(limitValue, 10); // Convert limit to number
 
   try {
     let q = collection(db, 'products');
@@ -24,31 +23,27 @@ export async function GET(req) {
 
     q = query(q, orderBy(sortBy, sortOrder));
 
-    // First, get the total count
-    const countSnapshot = await getDocs(q);
-    const totalProducts = countSnapshot.size;
+    // Fetch all products that match the category filter
+    const allProductsSnapshot = await getDocs(q);
+    let allProducts = allProductsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    // Then, apply pagination
-    if (pageNumber > 1) {
-      const lastVisible = await getDocs(query(q, limit((pageNumber - 1) * limitNumber)));
-      q = query(q, startAfter(lastVisible.docs[lastVisible.docs.length - 1]), limit(limitNumber));
-    } else {
-      q = query(q, limit(limitNumber)); // Apply limit for the first page
-    }
-
-    const snapshot = await getDocs(q);
-    let products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-     //console.log(products); 
-
+    // Apply search filter if provided
     if (search) {
-      const fuse = new Fuse(products, { keys: ['title'], threshold: 0.3 });
-      products = fuse.search(search).map(result => result.item);
+      const fuse = new Fuse(allProducts, { keys: ['title'], threshold: 0.3 });
+      allProducts = fuse.search(search).map(result => result.item);
     }
+
+    // Calculate total products and pages after filtering
+    const totalProducts = allProducts.length;
+    const totalPages = Math.ceil(totalProducts / limitValue);
+
+    // Apply pagination
+    const startIndex = (page - 1) * limitValue;
+    const paginatedProducts = allProducts.slice(startIndex, startIndex + limitValue);
 
     return new Response(JSON.stringify({
-      products,
-      totalPages: Math.ceil(totalProducts / limitNumber),
+      products: paginatedProducts,
+      totalPages,
       totalProducts,
     }), {
       status: 200,

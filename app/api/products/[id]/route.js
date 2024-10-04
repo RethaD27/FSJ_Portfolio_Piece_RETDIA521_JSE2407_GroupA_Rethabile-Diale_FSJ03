@@ -1,4 +1,3 @@
-// pages/api/product/[id].js
 import { db } from '../../../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 

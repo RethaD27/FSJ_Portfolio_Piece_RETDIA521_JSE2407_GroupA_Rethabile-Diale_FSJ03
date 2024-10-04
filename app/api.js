@@ -1,7 +1,4 @@
-// api.js
 import { cache } from 'react';
-
-//const API_BASE_URL = '/api';
 
 export const fetchProducts = cache(async (params = {}) => {
   const {
@@ -32,7 +29,7 @@ export const fetchProducts = cache(async (params = {}) => {
 });
 
 export const fetchProductById = cache(async (id) => {
-  const response = await fetch(`/api/product/${id}`);
+  const response = await fetch(`/api/products/${id}`);
   
   if (!response.ok) {
     if (response.status === 404) {
