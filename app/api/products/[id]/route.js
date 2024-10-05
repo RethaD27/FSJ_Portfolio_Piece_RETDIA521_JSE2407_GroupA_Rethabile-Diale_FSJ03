@@ -1,24 +1,44 @@
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/firebase';
+/*import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebase";
 
-export default async function handler(req, res) {
-  const { method, query: { id } } = req;
+export async function GET(request, { params }) {
 
-  if (method === 'GET') {
+    const { id } = params;
+
+    const paddedID = id.toString().padStart(3,"0");
+
     try {
-      const productRef = doc(db, 'products', id);
-      const productDoc = await getDoc(productRef);
+        const docRef = doc(db, "products", paddedID);
+        const docSnap = await getDoc(docRef);
 
-      if (productDoc.exists()) {
-        res.status(200).json({ id: productDoc.id, ...productDoc.data() });
-      } else {
-        res.status(404).json({ error: 'Product not found' });
-      }
+        if (!docSnap.exists()) {
+            return new Response(JSON.stringify({ error: "Product not found"}), { status: 404 });
+        }
+
+        return new Response(JSON.stringify(docSnap.data()), { status: 200 });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch product' });
+        return new Response(JSON.stringify({ error: error.message }), { status: 500 });
     }
-  } else {
-    res.setHeader('Allow', ['GET']);
-    res.status(405).end(`Method ${method} Not Allowed`);
+}*/
+
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebase";
+import { NextResponse } from "next/server";
+
+export async function GET(request, { params }) {
+  const { id } = params;
+  const paddedID = id.toString().padStart(3, "0");
+
+  try {
+    const docRef = doc(db, "products", paddedID);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(docSnap.data());
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

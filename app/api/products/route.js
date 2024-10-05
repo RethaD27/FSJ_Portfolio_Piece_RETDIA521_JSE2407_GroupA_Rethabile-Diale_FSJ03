@@ -1,9 +1,9 @@
-// app/api/products/route.js
 import { NextResponse } from 'next/server';
 import { db } from '@/firebase';
 import { collection, query, where, orderBy, limit, startAfter, getDocs } from 'firebase/firestore';
 import Fuse from 'fuse.js';
 
+// Fetch the last document from the previous page for pagination
 async function getLastDocFromPreviousPage(productsQuery, constraints, page, pageSize) {
   if (page <= 1) return null;
   const previousPageQuery = query(
@@ -20,7 +20,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page')) || 1;
     const pageSize = parseInt(searchParams.get('limit')) || 20;
-    const sortBy = searchParams.get('sortBy') || 'id';
+    const sortBy = searchParams.get('sortBy') || 'price'; // Default sorting by price
     const order = searchParams.get('order') || 'asc';
     const category = searchParams.get('category');
     const search = searchParams.get('search');
@@ -28,13 +28,16 @@ export async function GET(request) {
     let productsQuery = collection(db, 'products');
     let constraints = [];
 
+    // Filter by category
     if (category) {
       constraints.push(where('category', '==', category));
     }
 
+    // Order by specified field
     constraints.push(orderBy(sortBy, order));
     constraints.push(limit(pageSize));
 
+    // Handle pagination
     if (page > 1) {
       const lastDoc = await getLastDocFromPreviousPage(productsQuery, constraints, page, pageSize);
       if (lastDoc) {
@@ -44,24 +47,31 @@ export async function GET(request) {
 
     const finalQuery = query(productsQuery, ...constraints);
     const snapshot = await getDocs(finalQuery);
-    
+
     let products = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
 
+    // Searching using Fuse.js
     if (search) {
       const fuse = new Fuse(products, {
         keys: ['title'],
-        threshold: 0.3
+        threshold: 0.3,
       });
       products = fuse.search(search).map(result => result.item);
     }
+
+    // Calculate total pages and total products for pagination
+    const totalProducts = products.length;
+    const totalPages = Math.ceil(totalProducts / pageSize);
 
     return NextResponse.json({
       products,
       page,
       pageSize,
+      totalPages,
+      totalProducts,
       hasMore: products.length === pageSize
     });
   } catch (error) {

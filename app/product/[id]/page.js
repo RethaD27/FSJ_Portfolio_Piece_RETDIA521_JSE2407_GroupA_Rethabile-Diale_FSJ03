@@ -85,7 +85,7 @@ export default async function ProductPage({ params }) {
             </button>
           </div>
         </div>
-        <ReviewsSection reviews={product.reviews} />
+        <ReviewsSection {...product.reviews} />
       </div>
     </div>
   );
