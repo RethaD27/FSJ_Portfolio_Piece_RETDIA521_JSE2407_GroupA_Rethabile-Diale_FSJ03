@@ -52,16 +52,18 @@ export default async function ProductPage({ params }) {
             <h1 className="text-4xl font-bold mb-4 text-indigo-800">{product.title}</h1>
             <p className="text-3xl font-semibold text-indigo-600 mb-4">${product.price.toFixed(2)}</p>
             <p className="text-gray-700 mb-6 text-lg leading-relaxed">{product.description}</p>
-            <div className="mb-4 flex flex-wrap">
-              {product.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="inline-block bg-indigo-100 text-indigo-800 rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 transform hover:scale-105 transition-transform duration-300"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
+            {product.tags && (
+              <div className="mb-4 flex flex-wrap">
+                {product.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="inline-block bg-indigo-100 text-indigo-800 rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 transform hover:scale-105 transition-transform duration-300"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
             <p className="text-sm text-gray-600 mb-2">
               Rating:{' '}
               <span className="font-semibold text-yellow-500">
@@ -85,7 +87,7 @@ export default async function ProductPage({ params }) {
             </button>
           </div>
         </div>
-        <ReviewsSection {...product.reviews} />
+        {product.reviews && <ReviewsSection {...product.reviews} />}
       </div>
     </div>
   );
