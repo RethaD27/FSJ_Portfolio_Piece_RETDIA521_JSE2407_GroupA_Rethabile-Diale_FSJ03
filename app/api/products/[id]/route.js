@@ -1,5 +1,5 @@
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../..firebase';
+import { db } from '@/firebase';
 
 export default async function handler(req, res) {
   const { method, query: { id } } = req;
