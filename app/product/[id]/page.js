@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import ImageGallery from '../../components/ImageGallery';
 import ReviewsSection from './ReviewsSection';
-import { fetchProductById } from '@/app/api';
+import { fetchProductById } from '../../api';
 import GoBackButton from '../../components/GoBackButton';
 
 export async function generateMetadata({ params }) {

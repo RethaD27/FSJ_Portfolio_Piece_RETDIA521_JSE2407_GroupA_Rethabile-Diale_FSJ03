@@ -1,191 +1,95 @@
-import { cache } from 'react';
+import { cache } from "react";
 
-export const fetchProducts = cache(async (params = {}) => {
-  const {
-    page = 1,
-    limit = 20,
-    search = '',
-    category = '',
-    sortBy = 'price',
-    sortOrder = 'asc',
-  } = params;
-
-  const queryParams = new URLSearchParams({
+/**
+ * Fetch products with advanced filtering, sorting, and pagination
+ * This function is wrapped with React's cache function for automatic memoization
+ * @param {Object} options - The options for fetching products
+ * @param {number} [options.page=1] - The page number to fetch
+ * @param {number} [options.limit=20] - The number of products per page
+ * @param {string} [options.sortBy='id'] - The field to sort by
+ * @param {string} [options.order='asc'] - The sort order ('asc' or 'desc')
+ * @param {string} [options.category] - The category to filter by
+ * @param {string} [options.search] - The search term to filter by product title
+ * @returns {Promise<Object>} A promise that resolves to the product data
+ * @throws {Error} If the API request fails
+ */
+export const fetchProducts = cache(async ({
+  page = 1,
+  limit = 20,
+  sortBy = "id",
+  order = "asc",
+  category,
+  search,
+}) => {
+  const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
-    search,
-    category,
     sortBy,
-    sortOrder,
+    order,
   });
 
-  const response = await fetch(`/api/products`);
-  
+  if (category) params.append("category", category);
+  if (search) params.append("search", search);
+
+  const response = await fetch(`/api/products?${params}`, {
+    next: { revalidate: 60 }, // Revalidating every 60 seconds
+  });
+
   if (!response.ok) {
-    throw new Error('Failed to fetch products');
+    throw new Error("Failed to fetch products");
   }
 
   return response.json();
-  // const data = await response.json();
-  // return {
-  //   products: data.products || [],
-  //   totalPages: data.totalPages || 1,
-  //   totalProducts: data.totalProducts || 0,
-  // };
 });
 
-export const fetchProductById = cache(async (id) => {
+/**
+ * Fetch a single product by its ID
+ * This function is wrapped with React's cache function for automatic memoization
+ * @param {string|number} id - The ID of the product to fetch
+ * @returns {Promise<Object>} A promise that resolves to the product data
+ * @throws {Error} If the API request fails
+ */
+export const fetchProduct = cache(async (id) => {
+  const response = await fetch(`/api/products/${id}`, {
+    next: { revalidate: 300 }, // Revalidating every 5 minutes
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch product");
+  }
+
+  return response.json();
+});
+
+/**
+ * Fetch a single product by its ID without cache
+ * This function fetches a product without memoization, useful for specific cases
+ * @param {string|number} id - The ID of the product to fetch
+ * @returns {Promise<Object>} A promise that resolves to the product data
+ * @throws {Error} If the API request fails
+ */
+export const fetchProductById = async (id) => {
   const response = await fetch(`/api/products/${id}`);
-  
   if (!response.ok) {
-    if (response.status === 404) {
-      return null;
-    }
-    throw new Error('Failed to fetch product');
+    throw new Error("Failed to fetch product");
+  }
+  return response.json();
+};
+
+/**
+ * Fetch all available categories
+ * This function is wrapped with React's cache function for automatic memoization
+ * @returns {Promise<string[]>} A promise that resolves to an array of category names
+ * @throws {Error} If the API request fails
+ */
+export const fetchCategories = cache(async () => {
+  const response = await fetch("/api/categories", {
+    next: { revalidate: 3600 }, // Revalidating every hour
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch categories");
   }
 
   return response.json();
 });
-
-export const fetchCategories = cache(async () => {
-  const response = await fetch(`/api/categories`);
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch categories');
-  }
-
-  return response.json();
-});
-
-/*import { db } from '../firebase';
-import { collection, query, getDocs, doc, getDoc, orderBy, limit, startAfter } from 'firebase/firestore';
-
-// Fetch paginated products
-export async function fetchProducts(page = 1, limitValue = 20, cursor = null) {
-  const productsRef = collection(db, 'products');
-  let q;
-
-  if (cursor) {
-    q = query(productsRef, orderBy('title'), startAfter(cursor), limit(limitValue));
-  } else {
-    q = query(productsRef, orderBy('title'), limit(limitValue));
-  }
-
-  const querySnapshot = await getDocs(q);
-  const products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  
-  // Optionally handle cases where no products are found
-  if (products.length === 0) {
-    console.warn("No products found.");
-  }
-
-  return products; // Return only the products array
-}
-
-
-// Fetch a single product by ID
-export async function fetchProductById(id) {
-  const productRef = doc(db, 'products', id);
-  const productSnapshot = await getDoc(productRef);
-
-  if (!productSnapshot.exists()) {
-    throw new Error('Product not found');
-  }
-
-  return { id: productSnapshot.id, ...productSnapshot.data() };
-}
-
-export async function fetchCategories() {
-  const productsCollection = collection(db, 'products');
-  const snapshot = await getDocs(productsCollection);
-  
-  const categories = new Set();
-  snapshot.docs.forEach(doc => {
-    categories.add(doc.data().category);
-  });
-
-  return Array.from(categories);
-}
-
-
-/*import { db } from '../firebase';
-import { collection, query, getDocs, doc, getDoc, orderBy, limit, startAfter } from 'firebase/firestore';
-import { cache } from 'react';
-
-// Fetch paginated products from Firestore
-async function fetchProductsFromFirestore(page = 1, limitValue = 20, cursor = null, search = '', category = '', sortBy = 'price', sortOrder = 'asc') {
-  const productsRef = collection(db, 'products');
-  let q;
-
-  // Apply filters, search, and sorting to the query
-  if (cursor) {
-    q = query(
-      productsRef,
-      orderBy(sortBy, sortOrder),
-      startAfter(cursor),
-      limit(limitValue)
-    );
-  } else {
-    q = query(
-      productsRef,
-      orderBy(sortBy, sortOrder),
-      limit(limitValue)
-    );
-  }
-
-  const querySnapshot = await getDocs(q);
-  const products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-  return products;
-}
-
-// Fetch products with caching (API fallback)
-export const fetchProducts = cache(async (params = {}) => {
-  const {
-    page = 1,
-    limit = 20,
-    search = '',
-    category = '',
-    sortBy = 'price',
-    sortOrder = 'asc',
-    cursor = null,
-  } = params;
-
-  // Attempt to fetch products from Firebase Firestore
-  try {
-    const products = await fetchProductsFromFirestore(page, limit, cursor, search, category, sortBy, sortOrder);
-    return {
-      products: products || [],
-      totalPages: Math.ceil(products.length / limit),
-      totalProducts: products.length || 0,
-    };
-  } catch (error) {
-    console.error('Error fetching products from Firestore:', error);
-    throw new Error('Failed to fetch products');
-  }
-});
-
-// Fetch single product by ID from Firestore with caching
-export const fetchProductById = cache(async (id) => {
-  const productRef = doc(db, 'products', id);
-  const productSnapshot = await getDoc(productRef);
-
-  if (!productSnapshot.exists()) {
-    return null;
-  }
-
-  return { id: productSnapshot.id, ...productSnapshot.data() };
-});
-
-// Fetch categories from Firestore with caching
-export const fetchCategories = cache(async () => {
-  const productsCollection = collection(db, 'products');
-  const snapshot = await getDocs(productsCollection);
-
-  const categories = new Set();
-  snapshot.docs.forEach(doc => {
-    categories.add(doc.data().category);
-  });
-
-  return Array.from(categories);
-});*/
