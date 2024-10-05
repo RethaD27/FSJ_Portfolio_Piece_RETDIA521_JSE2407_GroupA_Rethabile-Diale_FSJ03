@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { fetchProducts, fetchCategories } from './api';
+import { fetchProducts } from './api';
 import ProductGrid from './components/ProductGrid';
 import Pagination from './components/Pagination';
 import FilterSort from './components/FilterSort';
@@ -29,7 +29,7 @@ export default function Home() {
         setLoading(true);
         const [productsData, categoriesData] = await Promise.all([
           fetchProducts({ page, search, category, sortBy, sortOrder }),
-          fetchCategories(),
+        
         ]);
         setProducts(productsData.products);
         setTotalPages(productsData.totalPages);

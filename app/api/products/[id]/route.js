@@ -1,9 +1,5 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
-import { db } from 'firebase'
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../..firebase';
 
 export default async function handler(req, res) {
   const { method, query: { id } } = req;
