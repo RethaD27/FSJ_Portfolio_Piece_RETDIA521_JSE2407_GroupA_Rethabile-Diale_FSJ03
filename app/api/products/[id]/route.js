@@ -21,22 +21,6 @@ export async function GET(request, { params }) {
     }
 }
 
-// app/api/products/[id]/route.js
-/*import { NextResponse } from "next/server";
-import { fetchProductById } from "@/app/api";
 
-export async function GET(request, { params }) {
-  const { id } = params;
 
-  try {
-    const product = await fetchProductById(id);
-    
-    if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
-    }
 
-    return NextResponse.json(product);
-  } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}*/

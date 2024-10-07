@@ -20,7 +20,7 @@ export default function Home() {
   const page = Number(searchParams.get('page')) || 1;
   const search = searchParams.get('search') || '';
   const category = searchParams.get('category') || '';
-  const sortBy = searchParams.get('sortBy') || 'price';
+  const sortBy = searchParams.get('sortBy') || '';
   const sortOrder = searchParams.get('sortOrder') || 'asc';
 
   useEffect(() => {
