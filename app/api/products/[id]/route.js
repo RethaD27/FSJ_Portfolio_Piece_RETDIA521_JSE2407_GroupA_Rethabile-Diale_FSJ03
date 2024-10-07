@@ -1,7 +1,9 @@
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase";
+import { NextResponse } from 'next/server';
 
 export async function GET(request, { params }) {
+    console.log('Product ID:', params.id);
 
     const { id } = params;
 
@@ -15,7 +17,7 @@ export async function GET(request, { params }) {
             return new Response(JSON.stringify({ error: "Product not found"}), { status: 404 });
         }
 
-        return new Response(JSON.stringify(docSnap.data()), { status: 200 });
+        return NextResponse.json(docSnap.data()) 
     } catch (error) {
         return new Response(JSON.stringify({ error: error.message }), { status: 500 });
     }
