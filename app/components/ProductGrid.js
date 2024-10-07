@@ -33,7 +33,8 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col h-[300px] sm:h-[350px] md:h-[400px]">
-      <Link href={`/products/${product.id}`} className="flex-grow">
+      {/* Fixed href without interpolation */}
+      <Link key={product.id} href={`/product/${product.id}`} className="flex-grow">
         <div className="p-4">
           <h2 className="text-xl font-semibold text-indigo-800 mb-2 truncate">{product.title}</h2>
           <div className="relative aspect-w-1 aspect-h-1 h-32 sm:h-40 md:h-48">
