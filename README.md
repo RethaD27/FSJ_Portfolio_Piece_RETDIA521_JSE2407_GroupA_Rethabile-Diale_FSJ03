@@ -1,10 +1,14 @@
+Here’s an updated version of your README file that includes all the relevant files you shared and provides a comprehensive introduction to the QuickCart Emporium project:
+
+---
+
 # QuickCart Emporium
 
 Welcome to **QuickCart Emporium**, a modern e-commerce web application built using Next.js. This project is designed to showcase an elegant and responsive user interface, providing features like pagination, product listing with image carousels, and customer reviews. 
 
 QuickCart Emporium focuses on providing a smooth user experience with a dynamic product grid, image galleries, and an interactive review system. The application is highly scalable and optimized for performance, ensuring a seamless browsing experience.
 
-## Vercel URL: (https://quickcart-emporium-2h5t6p7uh-rethabile-s-projects.vercel.app)
+## Vercel URL: [QuickCart Emporium](https://quickcart-emporium-2h5t6p7uh-rethabile-s-projects.vercel.app)
 
 ## Table of Contents
 
@@ -14,6 +18,8 @@ QuickCart Emporium focuses on providing a smooth user experience with a dynamic 
 - [Project Structure](#project-structure)
 - [Setup Instructions](#setup-instructions)
 - [Usage Examples](#usage-examples)
+- [Code Repository](#code-repository)
+- [Contributing](#contributing)
 
 ## Introduction
 
@@ -33,7 +39,9 @@ This project leverages modern web technologies to build a high-performance and r
 - **Next.js**: Framework for server-rendered React applications.
 - **React**: For building interactive user interfaces.
 - **Tailwind CSS**: Utility-first CSS framework for styling the components.
+- **Firebase**: For authentication and Firestore database management.
 - **JSDoc**: Used to document the code for better understanding and maintainability.
+- **Service Worker**: For caching resources and offline capabilities.
 - **API**: Custom API for fetching products and handling product details.
 
 ## Features
@@ -43,13 +51,14 @@ This project leverages modern web technologies to build a high-performance and r
 - **Customer Reviews**: Display reviews with a 5-star rating system.
 - **Responsive Design**: The application is fully responsive and works well on all screen sizes.
 - **Next.js Routing**: Dynamic routing for product detail pages.
+- **Offline Storage**: Save offline changes for synchronization with Firestore.
 
 ## Project Structure
 
 ```
 ├── components
 │   ├── FilterSort.js          // Handles product filtering and sorting
-|   ├── GoBackButton.js        // Provides a button to navigate back to the previous page
+│   ├── GoBackButton.js        // Provides a button to navigate back to the previous page
 │   ├── Header.js              // Contains the main header and navigation
 │   ├── ImageGallery.js        // Displays product images with a carousel-like effect
 │   ├── Pagination.js          // Handles pagination logic and UI
@@ -58,7 +67,7 @@ This project leverages modern web technologies to build a high-performance and r
 ├── pages
 │   ├── index.js               // Main page with product listings, filtering, sorting, and pagination
 │   ├── product/[id].js        // Product detail page
-|   ├── ReviewsSection.js      // Detailed reviews section for product details page
+│   ├── ReviewsSection.js       // Detailed reviews section for product details page
 ├── public                     // Contains static assets like images
 ├── styles
 │   └── globals.css            // Global styles using Tailwind CSS
@@ -68,6 +77,10 @@ This project leverages modern web technologies to build a high-performance and r
 ├── README.md                  // Project documentation
 ├── next.config.js             // Next.js configuration
 ├── package.json               // Project dependencies
+├── firebase.js                // Firebase configuration and initialization
+├── useAuth.js                 // Custom hook for authentication management
+├── syncOfflineChanges.js      // Functionality for handling offline data changes
+├── service-worker.js          // Service worker for caching resources
 ```
 
 ### Explanation of Root Files:
@@ -80,6 +93,18 @@ This project leverages modern web technologies to build a high-performance and r
 
 - **page.js**:  
    The main page file for rendering the homepage content. This file is used as the entry point for the application's homepage, where it integrates components like `FilterSort`, `ProductGrid`, and `Pagination`.
+
+- **firebase.js**:  
+   This file initializes Firebase and exports the Firestore database and authentication functionalities for use throughout the application.
+
+- **useAuth.js**:  
+   A custom hook that manages user authentication, including sign-in and sign-out functions, leveraging Firebase Authentication.
+
+- **syncOfflineChanges.js**:  
+   This file handles saving changes made offline and syncing them with Firestore when the application is back online.
+
+- **service-worker.js**:  
+   Implements caching strategies to enhance performance and provide offline capabilities.
 
 ## Setup Instructions
 
@@ -172,6 +197,11 @@ The `FilterSort` component allows users to sort products and filter them based o
 ```jsx
 <FilterSort products={products} setFilteredProducts={setFilteredProducts} />
 ```
+
+## Code Repository
+
+The source code for QuickCart Emporium can be found at the following link:  
+[QuickCart Emporium GitHub Repository](https://github.com/yourusername/quickcart-emporium)
 
 ## Contributing
 
