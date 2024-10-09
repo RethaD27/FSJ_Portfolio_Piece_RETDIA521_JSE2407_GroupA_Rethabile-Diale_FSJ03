@@ -1,9 +1,29 @@
 import { useState } from 'react';
 
+/**
+ * SignInModal component for user authentication.
+ *
+ * This modal allows users to sign in with their email and password.
+ *
+ * @component
+ * @param {Object} props - The props for the component.
+ * @param {Function} props.onClose - Function to be called when the modal is closed.
+ * @param {Function} props.onSignIn - Function to be called when the user attempts to sign in.
+ * @example
+ * return (
+ *   <SignInModal onClose={handleClose} onSignIn={handleSignIn} />
+ * );
+ */
 export default function SignInModal({ onClose, onSignIn }) {
+  // State variables for email and password
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  /**
+   * Handles the form submission for signing in the user.
+   *
+   * @param {React.FormEvent<HTMLFormElement>} e - The form event.
+   */
   const handleSubmit = (e) => {
     e.preventDefault();
     onSignIn(email, password);

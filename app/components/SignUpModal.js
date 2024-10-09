@@ -1,11 +1,32 @@
 import { useState } from 'react';
 
+/**
+ * SignUpModal component for user registration in a modal.
+ *
+ * This component provides a form for users to sign up by entering their email and password.
+ *
+ * @component
+ * @param {Object} props - The props for the component.
+ * @param {Function} props.onClose - Function to close the modal.
+ * @param {Function} props.onSignUp - Function to handle user sign-up.
+ * @example
+ * return (
+ *   <SignUpModal onClose={handleClose} onSignUp={handleSignUp} />
+ * );
+ */
 const SignUpModal = ({ onClose, onSignUp }) => {
+  // State variables for email, password, error, and success messages
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
+  /**
+   * Handles the form submission for user sign-up.
+   *
+   * @param {React.FormEvent<HTMLFormElement>} e - The form event.
+   * @returns {Promise<void>} - A promise that resolves when the sign-up process is complete.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);

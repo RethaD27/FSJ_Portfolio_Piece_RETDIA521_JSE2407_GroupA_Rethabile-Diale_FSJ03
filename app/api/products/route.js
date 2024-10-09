@@ -3,18 +3,19 @@ import { db } from '@/firebase';
 import { collection, query, where, orderBy, limit, startAfter, getDocs } from 'firebase/firestore';
 import Fuse from 'fuse.js';
 
-// Fetch the last document from the previous page for pagination
-async function getLastDocFromPreviousPage(productsQuery, constraints, page, pageSize) {
-  if (page <= 1) return null;
-  const previousPageQuery = query(
-    productsQuery,
-    ...constraints.filter(c => c.type !== 'limit'),
-    limit((page - 1) * pageSize)
-  );
-  const snap = await getDocs(previousPageQuery);
-  return snap.docs[snap.docs.length - 1];
-}
-
+/**
+ * Fetches products from Firestore based on query parameters such as pagination, sorting, filtering, and searching.
+ * 
+ * @async
+ * @function
+ * @param {Request} request - The HTTP request object containing query parameters for pagination and filtering.
+ * @returns {Promise<Response>} A Promise that resolves to a NextResponse containing the fetched products, pagination information, or an error message.
+ * 
+ * @example
+ * // Example of calling the GET function
+ * const response = await GET(request);
+ * const data = await response.json();
+ */
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -77,4 +78,26 @@ export async function GET(request) {
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+}
+
+/**
+ * Fetches the last document from the previous page for pagination.
+ * 
+ * @async
+ * @function
+ * @param {Query} productsQuery - The Firestore query to retrieve products.
+ * @param {Array} constraints - The constraints to apply to the query.
+ * @param {number} page - The current page number.
+ * @param {number} pageSize - The number of products per page.
+ * @returns {Promise<DocumentSnapshot|null>} The last document of the previous page or null if there is no previous page.
+ */
+async function getLastDocFromPreviousPage(productsQuery, constraints, page, pageSize) {
+  if (page <= 1) return null;
+  const previousPageQuery = query(
+    productsQuery,
+    ...constraints.filter(c => c.type !== 'limit'),
+    limit((page - 1) * pageSize)
+  );
+  const snap = await getDocs(previousPageQuery);
+  return snap.docs[snap.docs.length - 1];
 }

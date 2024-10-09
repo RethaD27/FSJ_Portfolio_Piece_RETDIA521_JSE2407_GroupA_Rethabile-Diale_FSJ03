@@ -5,13 +5,33 @@ import Image from 'next/image';
 import ImageGallery from '../../components/ImageGallery';
 import ReviewsSection from './ReviewsSection';
 import GoBackButton from '../../components/GoBackButton';
-import { fetchProductById } from '@/app/api'; // Ensure this is the correct path to the API fetch function
+import { fetchProductById } from '@/app/api';
 
+/**
+ * ProductPage component for displaying detailed information about a product.
+ * 
+ * This component fetches product data based on the provided product ID and displays 
+ * the product's details, such as images, price, description, tags, rating, and stock status.
+ * It also manages the reviews section, allowing users to add, update, and delete reviews.
+ * 
+ * @component
+ * @param {Object} params - The object containing route parameters.
+ * @param {string} params.id - The ID of the product to fetch.
+ * 
+ * @returns {JSX.Element} A page displaying product details, reviews, and actions.
+ */
 export default function ProductPage({ params }) {
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [error, setError] = useState(null);
 
+  /**
+   * useEffect hook to fetch product data and initialize the reviews state.
+   * 
+   * This effect is triggered whenever the `params.id` changes. It fetches
+   * the product data using the `fetchProductById` function and sets the product
+   * and reviews state accordingly.
+   */
   useEffect(() => {
     fetchProductById(params.id)
       .then((productData) => {
@@ -24,18 +44,30 @@ export default function ProductPage({ params }) {
       });
   }, [params.id]);
 
+  // Render an error message if fetching the product data fails.
   if (error) {
     return <div className="error-message">{error}</div>;
   }
 
+  // Render a loading message while the product data is being fetched.
   if (!product) {
     return <div>Loading...</div>;
   }
 
+  /**
+   * Handler for adding a new review to the product.
+   * 
+   * @param {Object} newReview - The new review object to add.
+   */
   const handleReviewAdded = (newReview) => {
     setReviews((prevReviews) => [...prevReviews, newReview]);
   };
 
+  /**
+   * Handler for updating an existing review.
+   * 
+   * @param {Object} updatedReview - The updated review object.
+   */
   const handleReviewUpdated = (updatedReview) => {
     setReviews((prevReviews) =>
       prevReviews.map((review) =>
@@ -44,12 +76,18 @@ export default function ProductPage({ params }) {
     );
   };
 
+  /**
+   * Handler for deleting a review.
+   * 
+   * @param {string} deletedReviewId - The ID of the review to delete.
+   */
   const handleReviewDeleted = (deletedReviewId) => {
     setReviews((prevReviews) =>
       prevReviews.filter((review) => review.id !== deletedReviewId)
     );
   };
 
+  // Render the product details and reviews section.
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gradient-to-r from-indigo-50 to-purple-50">
       <GoBackButton />

@@ -6,6 +6,31 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 const inter = Inter({ subsets: ['latin'] });
 
+/**
+ * Metadata configuration for the QuickCart Emporium site.
+ * 
+ * This metadata includes page title, description, Open Graph details, and Twitter card information
+ * to improve SEO and social media link previews.
+ * 
+ * @type {Object}
+ * @property {Object} title - The title configuration, including the default title and template for dynamic titles.
+ * @property {string} description - A short description of the site.
+ * @property {Object} icons - Icons for the site, including the favicon.
+ * @property {Object} openGraph - Open Graph metadata for social media sharing.
+ * @property {string} openGraph.title - The default Open Graph title.
+ * @property {string} openGraph.description - The Open Graph description.
+ * @property {string} openGraph.url - The URL of the site.
+ * @property {string} openGraph.siteName - The name of the website.
+ * @property {Array} openGraph.images - An array of images used for Open Graph previews.
+ * @property {string} openGraph.locale - The locale of the site, defaulting to 'en_US'.
+ * @property {string} openGraph.type - The type of site, which is 'website' for this project.
+ * @property {Object} twitter - Twitter metadata for card previews.
+ * @property {string} twitter.card - The Twitter card type, set to 'summary_large_image'.
+ * @property {string} twitter.title - The title for Twitter previews.
+ * @property {string} twitter.description - The description for Twitter previews.
+ * @property {Array} twitter.images - An array of images for Twitter previews.
+ * @property {string} twitter.creator - The Twitter username of the site creator.
+ */
 export const metadata = {
   title: {
     default: 'QuickCart Emporium | Your One-Stop Shop',
@@ -40,6 +65,17 @@ export const metadata = {
   },
 };
 
+/**
+ * Root layout component for the application.
+ * 
+ * This component wraps the entire application, providing global styles, a header, and an error boundary.
+ * It includes SEO-related metadata and ensures that the layout is responsive and visually appealing.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {React.ReactNode} props.children - Child components to be rendered within the layout.
+ * @returns {JSX.Element} The rendered root layout of the application.
+ */
 export default function RootLayout({ children }) {
   return (
     <html lang="en">

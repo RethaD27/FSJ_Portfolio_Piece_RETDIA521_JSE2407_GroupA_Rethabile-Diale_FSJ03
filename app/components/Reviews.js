@@ -1,7 +1,28 @@
 import { useState } from 'react';
 import { useAuth } from '../useAuth';
 
+/**
+ * Reviews component for displaying, adding, editing, and deleting product reviews.
+ *
+ * @component
+ * @param {Object} props - Component properties.
+ * @param {Array} props.reviews - The list of reviews for the product.
+ * @param {string} props.productId - The ID of the product for which reviews are being managed.
+ * @param {Function} props.onReviewAdded - Callback function to be called when a review is added.
+ * @param {Function} props.onReviewUpdated - Callback function to be called when a review is updated.
+ * @param {Function} props.onReviewDeleted - Callback function to be called when a review is deleted.
+ *
+ * @example
+ * <Reviews
+ *   reviews={reviews}
+ *   productId={productId}
+ *   onReviewAdded={handleReviewAdded}
+ *   onReviewUpdated={handleReviewUpdated}
+ *   onReviewDeleted={handleReviewDeleted}
+ * />
+ */
 export default function Reviews({ reviews, productId, onReviewAdded, onReviewUpdated, onReviewDeleted }) {
+  // State variables
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [editingReview, setEditingReview] = useState(null);
   const [error, setError] = useState(null);
@@ -11,6 +32,13 @@ export default function Reviews({ reviews, productId, onReviewAdded, onReviewUpd
   const [isSignedIn, setIsSignedIn] = useState(false);
   const { user, signIn } = useAuth() || {};
 
+  /**
+   * Handles user sign-in.
+   *
+   * @async
+   * @function handleSignIn
+   * @returns {Promise<void>}
+   */
   const handleSignIn = async () => {
     try {
       await signIn(email, password);
@@ -23,6 +51,13 @@ export default function Reviews({ reviews, productId, onReviewAdded, onReviewUpd
     }
   };
 
+  /**
+   * Handles adding a new review.
+   *
+   * @async
+   * @function handleAddReview
+   * @returns {Promise<void>}
+   */
   const handleAddReview = async () => {
     if (!user) {
       setError('You must be logged in to add a review.');
@@ -52,6 +87,14 @@ export default function Reviews({ reviews, productId, onReviewAdded, onReviewUpd
     }
   };
 
+  /**
+   * Handles editing an existing review.
+   *
+   * @async
+   * @function handleEditReview
+   * @param {string} reviewId - The ID of the review to edit.
+   * @returns {Promise<void>}
+   */
   const handleEditReview = async (reviewId) => {
     try {
       const response = await fetch(`/api/products/${productId}/reviews`, {
@@ -76,6 +119,14 @@ export default function Reviews({ reviews, productId, onReviewAdded, onReviewUpd
     }
   };
 
+  /**
+   * Handles deleting a review.
+   *
+   * @async
+   * @function handleDeleteReview
+   * @param {string} reviewId - The ID of the review to delete.
+   * @returns {Promise<void>}
+   */
   const handleDeleteReview = async (reviewId) => {
     try {
       const response = await fetch(`/api/products/${productId}/reviews`, {
@@ -96,6 +147,13 @@ export default function Reviews({ reviews, productId, onReviewAdded, onReviewUpd
     }
   };
 
+  /**
+   * Renders stars based on the rating.
+   *
+   * @function renderStars
+   * @param {number} rating - The rating to display as stars.
+   * @returns {JSX.Element} The rendered star rating.
+   */
   const renderStars = (rating) => {
     return (
       <div className="flex text-yellow-400" aria-label={`Rating: ${rating} out of 5`}>

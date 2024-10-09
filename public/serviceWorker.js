@@ -2,10 +2,14 @@ const CACHE_NAME = 'quickcart-cache-v1';
 const urlsToCache = [
   '/',
   '/styles/globals.css',
-  '/scripts/main.js',
-  // Add other static assets here
 ];
 
+/**
+ * Installs the service worker and caches specified URLs.
+ * This event is triggered when the service worker is installed.
+ *
+ * @param {InstallEvent} event - The install event.
+ */
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -13,6 +17,12 @@ self.addEventListener('install', (event) => {
   );
 });
 
+/**
+ * Activates the service worker and cleans up old caches.
+ * This event is triggered when the service worker is activated.
+ *
+ * @param {ActivateEvent} event - The activate event.
+ */
 self.addEventListener('activate', (event) => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -28,6 +38,13 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+/**
+ * Handles fetch events to serve cached responses or fetch new ones.
+ * If the requested resource is in the cache, it returns the cached response.
+ * Otherwise, it fetches the resource from the network and caches it.
+ *
+ * @param {FetchEvent} event - The fetch event.
+ */
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
@@ -54,12 +71,23 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Helper function to determine if a request is for an image
+/**
+ * Helper function to determine if a request is for an image.
+ *
+ * @param {Request} request - The fetch request.
+ * @returns {boolean} - True if the request is for an image, false otherwise.
+ */
 function isImageRequest(request) {
   return request.url.match(/\.(jpg|jpeg|png|gif|svg)$/);
 }
 
-// Helper function to cache a response
+/**
+ * Helper function to cache a response.
+ * This function stores a response in the cache for the given request.
+ *
+ * @param {Request} request - The fetch request to cache the response for.
+ * @param {Response} response - The response to cache.
+ */
 function cacheResponse(request, response) {
   const responseToCache = response.clone();
   caches.open(CACHE_NAME).then((cache) => {

@@ -7,9 +7,19 @@ import ProductGrid from './components/ProductGrid';
 import Pagination from './components/Pagination';
 import FilterSort from './components/FilterSort';
 
+/**
+ * The Home component handles the product listing page. It includes filtering, sorting,
+ * pagination, and search functionalities. Data is fetched from the API and displayed in
+ * a grid format. It also supports service worker integration for detecting new app versions.
+ * 
+ * @component
+ * @returns {JSX.Element} The rendered product listing page with filters, sorting, pagination, and product grid.
+ */
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  
+  // State variables
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,12 +27,17 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
 
+  // Extract query parameters from the URL
   const page = Number(searchParams.get('page')) || 1;
   const search = searchParams.get('search') || '';
   const category = searchParams.get('category') || '';
   const sortBy = searchParams.get('sortBy') || '';
   const sortOrder = searchParams.get('sortOrder') || 'asc';
 
+  /**
+   * Fetches the products and categories data from the API and updates the state.
+   * This effect runs whenever the page, search, category, sortBy, or sortOrder changes.
+   */
   useEffect(() => {
     async function loadData() {
       try {
@@ -45,7 +60,10 @@ export default function Home() {
     loadData();
   }, [page, search, category, sortBy, sortOrder]);
 
-  // Service worker setup for new version detection
+  /**
+   * Sets up a service worker to detect new versions of the app. If a new version is found,
+   * it prompts the user to refresh the page.
+   */
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then(registration => {
@@ -63,6 +81,11 @@ export default function Home() {
     }
   }, []);
 
+  /**
+   * Updates the URL based on new query parameters for page, search, category, sortBy, and sortOrder.
+   * 
+   * @param {Object} newParams - The new parameters to update the URL with.
+   */
   const updateUrl = (newParams) => {
     const updatedSearchParams = new URLSearchParams(searchParams);
     Object.entries(newParams).forEach(([key, value]) => {
@@ -75,26 +98,51 @@ export default function Home() {
     router.push(`/?${updatedSearchParams.toString()}`);
   };
 
+  /**
+   * Handles the category filter update and resets the page to 1 when a new category is selected.
+   * 
+   * @param {string} newCategory - The new category to filter the products by.
+   */
   const handleFilter = (newCategory) => {
     updateUrl({ category: newCategory, page: 1 });
   };
 
+  /**
+   * Handles sorting of the products by the selected field and order.
+   * 
+   * @param {string} newSortBy - The field to sort the products by.
+   * @param {string} newSortOrder - The sort order ('asc' or 'desc').
+   */
   const handleSort = (newSortBy, newSortOrder) => {
     updateUrl({ sortBy: newSortBy, sortOrder: newSortOrder, page: 1 });
   };
 
+  /**
+   * Handles the search query update and resets the page to 1 when a new search query is entered.
+   * 
+   * @param {string} newSearch - The new search query to filter the products by.
+   */
   const handleSearch = (newSearch) => {
     updateUrl({ search: newSearch, page: 1 });
   };
 
+  /**
+   * Handles the page change for pagination.
+   * 
+   * @param {number} newPage - The new page number to navigate to.
+   */
   const handlePageChange = (newPage) => {
     updateUrl({ page: newPage });
   };
 
+  /**
+   * Resets all filters, search, sort, and pagination, navigating to the base URL.
+   */
   const handleReset = () => {
     router.push('/');
   };
 
+  // Render error message if there's any error
   if (error) {
     return (
       <div className="text-red-600 text-center p-4 bg-red-100 rounded-lg">
