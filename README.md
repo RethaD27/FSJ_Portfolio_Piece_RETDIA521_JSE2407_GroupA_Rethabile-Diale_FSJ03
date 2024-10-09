@@ -120,7 +120,7 @@ To run this project locally, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/quickcart-emporium.git
+   git clone https://github.com/RethaD27/FSJ_Portfolio_Piece_RETDIA521_JSE2407_GroupA_Rethabile-Diale_FSJ03.git
    cd quickcart-emporium
    ```
 
@@ -201,7 +201,7 @@ The `FilterSort` component allows users to sort products and filter them based o
 ## Code Repository
 
 The source code for QuickCart Emporium can be found at the following link:  
-[QuickCart Emporium GitHub Repository](https://github.com/yourusername/quickcart-emporium)
+[QuickCart Emporium GitHub Repository](https://github.com/RethaD27/FSJ_Portfolio_Piece_RETDIA521_JSE2407_GroupA_Rethabile-Diale_FSJ03.git)
 
 ## Contributing
 
