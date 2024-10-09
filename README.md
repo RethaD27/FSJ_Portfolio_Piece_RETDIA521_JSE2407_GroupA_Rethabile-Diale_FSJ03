@@ -1,7 +1,3 @@
-Here’s an updated version of your README file that includes all the relevant files you shared and provides a comprehensive introduction to the QuickCart Emporium project:
-
----
-
 # QuickCart Emporium
 
 Welcome to **QuickCart Emporium**, a modern e-commerce web application built using Next.js. This project is designed to showcase an elegant and responsive user interface, providing features like pagination, product listing with image carousels, and customer reviews. 
