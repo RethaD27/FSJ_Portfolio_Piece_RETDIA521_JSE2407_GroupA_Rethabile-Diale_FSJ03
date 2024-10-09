@@ -45,6 +45,24 @@ export default function Home() {
     loadData();
   }, [page, search, category, sortBy, sortOrder]);
 
+  // Service worker setup for new version detection
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(registration => {
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              if (confirm('A new version of the app is available. Refresh to update?')) {
+                window.location.reload();
+              }
+            }
+          });
+        });
+      });
+    }
+  }, []);
+
   const updateUrl = (newParams) => {
     const updatedSearchParams = new URLSearchParams(searchParams);
     Object.entries(newParams).forEach(([key, value]) => {

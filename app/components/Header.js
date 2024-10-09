@@ -1,12 +1,12 @@
 "use client";
 
-import Link from 'next/link';
-import { useState } from 'react';
-import { useAuth } from '../../useAuth';
-import { signIn, signOutUser, signUp } from '../authFunctions';
-import { FaUser, FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
-import SignInModal from './SignInModal';
-import SignUpModal from './SignUpModal';
+import Link from "next/link";
+import { useState } from "react";
+import { useAuth } from "../useAuth";
+import { signIn, signOutUser, signUp } from "../authFunctions";
+import { FaUser, FaSignInAlt, FaSignOutAlt } from "react-icons/fa";
+import SignInModal from "./SignInModal";
+import SignUpModal from "./SignUpModal";
 
 /**
  * Header component that displays the navigation bar with links to different pages.
@@ -68,38 +68,59 @@ export default function Header() {
         {user ? (
           <div className="flex items-center space-x-4">
             <FaUser className="text-white text-2xl" />
-            <Link href="/" onClick={handleSignOut} className="text-white flex items-center space-x-1 hover:text-yellow-300 transition-colors duration-300">
+            <Link
+              href="/"
+              onClick={handleSignOut}
+              className="text-white flex items-center space-x-1 hover:text-yellow-300 transition-colors duration-300"
+            >
               <FaSignOutAlt />
               <span>Sign Out</span>
             </Link>
           </div>
         ) : (
           <div className="flex items-center space-x-4">
-            <Link href="#" onClick={() => setIsSignInModalOpen(true)} className="text-white flex items-center space-x-1 hover:text-yellow-300 transition-colors duration-300">
+            <Link
+              href="#"
+              onClick={() => setIsSignInModalOpen(true)}
+              className="text-white flex items-center space-x-1 hover:text-yellow-300 transition-colors duration-300"
+            >
               <FaSignInAlt />
               <span>Sign In</span>
             </Link>
-            <Link href="#" onClick={() => setIsSignUpModalOpen(true)} className="text-white flex items-center space-x-1 hover:text-yellow-300 transition-colors duration-300">
+            <Link
+              href="#"
+              onClick={() => setIsSignUpModalOpen(true)}
+              className="text-white flex items-center space-x-1 hover:text-yellow-300 transition-colors duration-300"
+            >
               <span>Sign Up</span>
             </Link>
           </div>
         )}
 
         {/* Navigation links */}
-        <nav className={`${isMenuOpen ? 'block' : 'hidden'} sm:block`}>
+        <nav className={`${isMenuOpen ? "block" : "hidden"} sm:block`}>
           <ul className="flex space-x-8">
             <li>
-              <Link href="/" className="text-white hover:text-yellow-300 transition-colors duration-300 text-lg font-semibold">
+              <Link
+                href="/"
+                className="text-white hover:text-yellow-300 transition-colors duration-300 text-lg font-semibold"
+              >
                 Home
               </Link>
             </li>
             <li>
-              <Link href="/categories" className="text-white hover:text-yellow-300 transition-colors duration-300 text-lg font-semibold">
+              <Link
+                href="/categories"
+                className="text-white hover:text-yellow-300 transition-colors duration-300 text-lg font-semibold"
+              >
                 Categories
               </Link>
             </li>
             <li>
-              <Link href="/cart" className="text-white hover:text-yellow-300 transition-colors duration-300 text-lg font-semibold">
+              <Link
+                href="/cart"
+                className="text-white hover:text-yellow-300 transition-colors duration-300 text-lg font-semibold"
+              >
                 Cart
               </Link>
             </li>
@@ -108,8 +129,18 @@ export default function Header() {
       </div>
 
       {/* Modals */}
-      {isSignInModalOpen && <SignInModal onClose={() => setIsSignInModalOpen(false)} onSignIn={handleSignIn} />}
-      {isSignUpModalOpen && <SignUpModal onClose={() => setIsSignUpModalOpen(false)} onSignUp={handleSignUp} />}
+      {isSignInModalOpen && (
+        <SignInModal
+          onClose={() => setIsSignInModalOpen(false)}
+          onSignIn={handleSignIn}
+        />
+      )}
+      {isSignUpModalOpen && (
+        <SignUpModal
+          onClose={() => setIsSignUpModalOpen(false)}
+          onSignUp={handleSignUp}
+        />
+      )}
     </header>
   );
 }

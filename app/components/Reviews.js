@@ -1,33 +1,49 @@
 import { useState } from 'react';
-import { useAuth } from '../../useAuth';
+import { useAuth } from '../useAuth';
 
 export default function Reviews({ reviews, productId, onReviewAdded, onReviewUpdated, onReviewDeleted }) {
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
-  const [editingReview, setEditingReview] = useState({ rating: 5, comment: '' }); // Default values
+  const [editingReview, setEditingReview] = useState(null);
   const [error, setError] = useState(null);
-  const { user } = useAuth() || {}; // Safe destructuring with fallback
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const { user, signIn } = useAuth() || {};
+
+  const handleSignIn = async () => {
+    try {
+      await signIn(email, password);
+      setIsSignedIn(true);
+      setEmail('');
+      setPassword('');
+      setSuccessMessage('Successfully signed in!');
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
   const handleAddReview = async () => {
     if (!user) {
-      alert('You must be logged in to add a review.');
+      setError('You must be logged in to add a review.');
       return;
     }
 
     try {
-      const response = await fetch('/api/reviews/add', {
+      const response = await fetch(`/api/products/${productId}/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${await user.getIdToken()}`
         },
-        body: JSON.stringify({ ...newReview, productId })
+        body: JSON.stringify(newReview)
       });
 
       if (response.ok) {
         const addedReview = await response.json();
         onReviewAdded(addedReview);
         setNewReview({ rating: 5, comment: '' });
-        alert('Review added successfully!');
+        setSuccessMessage('Review added successfully!');
       } else {
         throw new Error('Failed to add review');
       }
@@ -38,20 +54,20 @@ export default function Reviews({ reviews, productId, onReviewAdded, onReviewUpd
 
   const handleEditReview = async (reviewId) => {
     try {
-      const response = await fetch(`/api/reviews/edit/${reviewId}`, {
+      const response = await fetch(`/api/products/${productId}/reviews`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${await user.getIdToken()}`
         },
-        body: JSON.stringify({ ...editingReview, productId })
+        body: JSON.stringify({ ...editingReview, reviewId })
       });
 
       if (response.ok) {
         const updatedReview = await response.json();
         onReviewUpdated(updatedReview);
-        setEditingReview({ rating: 5, comment: '' }); // Reset after editing
-        alert('Review updated successfully!');
+        setEditingReview(null);
+        setSuccessMessage('Review updated successfully!');
       } else {
         throw new Error('Failed to update review');
       }
@@ -62,7 +78,7 @@ export default function Reviews({ reviews, productId, onReviewAdded, onReviewUpd
 
   const handleDeleteReview = async (reviewId) => {
     try {
-      const response = await fetch(`/api/reviews/delete/${reviewId}`, {
+      const response = await fetch(`/api/products/${productId}/reviews`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${await user.getIdToken()}`
@@ -71,7 +87,7 @@ export default function Reviews({ reviews, productId, onReviewAdded, onReviewUpd
 
       if (response.ok) {
         onReviewDeleted(reviewId);
-        alert('Review deleted successfully!');
+        setSuccessMessage('Review deleted successfully!');
       } else {
         throw new Error('Failed to delete review');
       }
@@ -84,7 +100,7 @@ export default function Reviews({ reviews, productId, onReviewAdded, onReviewUpd
     return (
       <div className="flex text-yellow-400" aria-label={`Rating: ${rating} out of 5`}>
         {[...Array(5)].map((_, i) => (
-          <span key={i} className={`text-2xl ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}>
+          <span key={i} className={`text-2xl ${i < rating ? "text-yellow-400" : "text-gray-300"}`}>
             ★
           </span>
         ))}
@@ -96,119 +112,88 @@ export default function Reviews({ reviews, productId, onReviewAdded, onReviewUpd
     <div className="space-y-8">
       <h2 className="text-xl font-bold mb-4">Customer Reviews</h2>
       {error && <div className="text-red-600">{error}</div>}
-      
-      {/* Review Form */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-semibold mb-4">Add a Review</h3>
-        <div className="mb-4">
-          <label className="block mb-2">Rating:</label>
-          <select
-            value={newReview.rating}
-            onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
-            className="border p-2 rounded w-full"
-          >
-            {[1, 2, 3, 4, 5].map((rating) => (
-              <option key={rating} value={rating}>{rating}</option>
-            ))}
-          </select>
-        </div>
-        <div className="mb-4">
-          <label className="block mb-2">Comment:</label>
-          <textarea
-            value={newReview.comment}
-            onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-            className="border p-2 rounded w-full"
-            rows="4"
-            placeholder="Write your review..."
-          />
-        </div>
-        <button
-          onClick={handleAddReview}
-          className="bg-indigo-600 text-white py-2 px-4 rounded"
-        >
-          Submit Review
-        </button>
-      </div>
+      {successMessage && <div className="text-green-600">{successMessage}</div>}
 
-      {/* Displaying Reviews */}
-      {reviews.map((review) => (
-        <div
-          key={review.id}
-          className="bg-white rounded-lg shadow-md p-6 transition-all duration-300 hover:shadow-lg"
-        >
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-            <span className="font-semibold text-lg text-indigo-700 mb-2 sm:mb-0">
-              {review.reviewerName}
-            </span>
-            <span className="text-sm text-purple-600">
-              {new Date(review.date).toLocaleDateString('en-GB')}
-            </span>
+      {!isSignedIn && (
+        <div className="bg-white rounded-lg shadow-md p-6 mb-4">
+          <h3 className="text-lg font-semibold mb-4">Sign In</h3>
+          <div className="mb-4">
+            <label className="block mb-2">Email:</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="border p-2 rounded w-full"
+              placeholder="Enter your email"
+            />
           </div>
-          <div className="flex items-center mb-4">
-            {renderStars(review.rating)}
-            <span className="ml-2 text-purple-700 font-semibold">
-              {review.rating} / 5
-            </span>
+          <div className="mb-4">
+            <label className="block mb-2">Password:</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="border p-2 rounded w-full"
+              placeholder="Enter your password"
+            />
           </div>
-          <p className="text-gray-700 leading-relaxed">{review.comment}</p>
-          {/* Edit and Delete buttons */}
-          <div className="flex space-x-4 mt-4">
-            <button
-              onClick={() => setEditingReview(review)}
-              className="text-indigo-600 hover:underline"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDeleteReview(review.id)}
-              className="text-red-600 hover:underline"
-            >
-              Delete
-            </button>
-          </div>
+          <button onClick={handleSignIn} className="bg-indigo-600 text-white py-2 px-4 rounded">
+            Sign In
+          </button>
+        </div>
+      )}
 
-          {/* Editing Form */}
-          {editingReview.id === review.id && (
-            <div className="mt-4">
-              <h4 className="text-lg font-semibold mb-2">Edit Review</h4>
-              <div className="mb-4">
-                <label className="block mb-2">Rating:</label>
-                <select
-                  value={editingReview.rating}
-                  onChange={(e) => setEditingReview({ ...editingReview, rating: Number(e.target.value) })}
-                  className="border p-2 rounded w-full"
-                >
-                  {[1, 2, 3, 4, 5].map((rating) => (
-                    <option key={rating} value={rating}>{rating}</option>
-                  ))}
-                </select>
+      {isSignedIn && (
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-semibold mb-4">Add a Review</h3>
+          <div className="mb-4">
+            <label className="block mb-2">Rating:</label>
+            <select
+              value={newReview.rating}
+              onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
+              className="border p-2 rounded w-full"
+            >
+              {[1, 2, 3, 4, 5].map((rating) => (
+                <option key={rating} value={rating}>
+                  {rating}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">Comment:</label>
+            <textarea
+              value={newReview.comment}
+              onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+              className="border p-2 rounded w-full"
+              placeholder="Enter your review"
+            />
+          </div>
+          <button onClick={handleAddReview} className="bg-indigo-600 text-white py-2 px-4 rounded">
+            Submit Review
+          </button>
+        </div>
+      )}
+
+      <div>
+        {reviews.map((review) => (
+          <div key={review.id} className="bg-gray-100 p-4 rounded-lg shadow mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold">{review.reviewerName}</h3>
+                {renderStars(review.rating)}
+                <p className="text-gray-600">{review.comment}</p>
               </div>
-              <div className="mb-4">
-                <label className="block mb-2">Comment:</label>
-                <textarea
-                  value={editingReview.comment}
-                  onChange={(e) => setEditingReview({ ...editingReview, comment: e.target.value })}
-                  className="border p-2 rounded w-full"
-                  rows="4"
-                  placeholder="Edit your review..."
-                />
-              </div>
-              <button
-                onClick={() => handleEditReview(review.id)}
-                className="bg-indigo-600 text-white py-2 px-4 rounded"
-              >
-                Update Review
-              </button>
-              <button
-                onClick={() => setEditingReview({ rating: 5, comment: '' })} // Reset after cancel
-                className="text-gray-600 hover:underline ml-4"
-              >
-                Cancel
-              </button>
+              {user && user.email === review.reviewerEmail && (
+                <div>
+                  <button onClick={() => setEditingReview(review)} className="text-blue-600">Edit</button>
+                  <button onClick={() => handleDeleteReview(review.id)} className="text-red-600 ml-2">Delete</button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

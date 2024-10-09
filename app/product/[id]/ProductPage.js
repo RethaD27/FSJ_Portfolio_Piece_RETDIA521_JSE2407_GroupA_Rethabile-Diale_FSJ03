@@ -1,13 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import ImageGallery from '../../components/ImageGallery';
 import ReviewsSection from './ReviewsSection';
-import GoBackButton from '../../components/GoBackButton.js';
+import GoBackButton from '../../components/GoBackButton';
+import { fetchProductById } from '@/app/api'; // Ensure this is the correct path to the API fetch function
 
-export default function ProductPage({ product, params }) {
-  const [reviews, setReviews] = useState(product.reviews || []);
+export default function ProductPage({ params }) {
+  const [product, setProduct] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchProductById(params.id)
+      .then((productData) => {
+        setProduct(productData);
+        setReviews(productData.reviews || []); // Initialize reviews
+      })
+      .catch(error => {
+        console.error('Error fetching product:', error);
+        setError('Unable to load product data. Please check your internet connection.');
+      });
+  }, [params.id]);
+
+  if (error) {
+    return <div className="error-message">{error}</div>;
+  }
+
+  if (!product) {
+    return <div>Loading...</div>;
+  }
 
   const handleReviewAdded = (newReview) => {
     setReviews((prevReviews) => [...prevReviews, newReview]);
