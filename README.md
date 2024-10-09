@@ -4,6 +4,8 @@ Welcome to **QuickCart Emporium**, a modern e-commerce web application built usi
 
 QuickCart Emporium focuses on providing a smooth user experience with a dynamic product grid, image galleries, and an interactive review system. The application is highly scalable and optimized for performance, ensuring a seamless browsing experience.
 
+## Vercel URL: (https://quickcart-emporium-2h5t6p7uh-rethabile-s-projects.vercel.app)
+
 ## Table of Contents
 
 - [Introduction](#introduction)
