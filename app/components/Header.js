@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useAuth } from "../useAuth";
-import { signIn, signOutUser, signUp } from "../authFunctions";
+import { useAuth } from "../useAuth"; // Custom hook to access the user state
+import { signIn, signOutUser, signUp } from "../authFunctions"; // Import authentication functions
 import { FaUser, FaSignInAlt, FaSignOutAlt } from "react-icons/fa";
 import SignInModal from "./SignInModal";
 import SignUpModal from "./SignUpModal";
@@ -18,7 +18,7 @@ export default function Header() {
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
 
-  const user = useAuth();
+  const { user, setUser } = useAuth(); // Get the current authenticated user and setUser
 
   const handleSignIn = async (email, password) => {
     try {
@@ -31,7 +31,9 @@ export default function Header() {
 
   const handleSignOut = async () => {
     try {
-      await signOutUser();
+      await signOutUser(); // Call the sign-out function
+      setUser(null); // Update user state
+      console.log("Sign-out successful");
     } catch (error) {
       console.error("Sign-out error:", error);
     }
@@ -69,7 +71,7 @@ export default function Header() {
           <div className="flex items-center space-x-4">
             <FaUser className="text-white text-2xl" />
             <Link
-              href="/"
+              href="#"
               onClick={handleSignOut}
               className="text-white flex items-center space-x-1 hover:text-yellow-300 transition-colors duration-300"
             >
